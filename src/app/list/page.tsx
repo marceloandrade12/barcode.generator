@@ -1,18 +1,47 @@
 "use client";
 
+import React from "react";
 import { BarCode } from "@/components/barcode";
 import NoSsr from "@/components/noSsr";
 import { useCodesStore } from "@/store/codes";
-import React from "react";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
-// TODO:
-/**
- * EXPORT PDF
- * DARK MODE iOS
- */
+import { font } from "../../components/font";
+import { Button } from "@/components/button";
 
 export default function List() {
   const codes = useCodesStore((state) => state.codes);
+
+  const body = codes.map((c) => [c.description, c.code, c.code128]);
+
+  const handleOnClickExport = React.useCallback((): void => {
+    const doc = new jsPDF();
+    doc.addFileToVFS("LibreBarcode128-Regular.ttf", font);
+    doc.addFont("LibreBarcode128-Regular.ttf", "Libre_Barcode_128", "normal");
+
+    autoTable(doc, {
+      head: [["Descrição", "Código", "Código de Barras"]],
+      body: [...body],
+      columnStyles: {
+        0: {
+          valign: "middle",
+        },
+        1: {
+          valign: "middle",
+        },
+        2: {
+          font: "Libre_Barcode_128",
+          fontSize: 40,
+          fontStyle: "normal",
+          valign: "middle",
+          halign: "center",
+        },
+      },
+    });
+
+    doc.save(`barcode-${new Date().toISOString()}.pdf`);
+  }, [body]);
 
   return (
     <NoSsr>
@@ -50,6 +79,11 @@ export default function List() {
           </tbody>
         </table>
       </div>
+      <Button
+        text="Exportar"
+        onClick={handleOnClickExport}
+        className="mt-[30px]"
+      />
     </NoSsr>
   );
 }
