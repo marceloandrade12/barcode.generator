@@ -9,6 +9,8 @@ export interface Code {
   description: string;
   // code already encoded to 128
   code128: string;
+  //
+  id: number;
 }
 
 export interface CodesState {
@@ -21,6 +23,7 @@ export const codesInitialState: CodesState = {
 
 interface UseCodesStoreOutput extends CodesState {
   saveCode: (codes: Code) => void;
+  deleteCode: (code: Code) => void;
 }
 
 export const useCodesStore = StoreHelper.createStore<UseCodesStoreOutput>(
@@ -31,6 +34,14 @@ export const useCodesStore = StoreHelper.createStore<UseCodesStoreOutput>(
         produce((state: CodesState) => ({ codes: [...state.codes, code] })),
         false,
         "@@CODES/saveCode"
+      ),
+    deleteCode: (code: Code) =>
+      set(
+        produce((state: CodesState) => ({
+          codes: state.codes.filter((c) => c.id !== code.id),
+        })),
+        false,
+        "@@CODES/deleteCode"
       ),
   }),
   "@@CODES"

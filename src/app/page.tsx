@@ -21,6 +21,7 @@ export default function Home() {
     code: "",
     description: "",
     code128: "",
+    id: new Date().getTime(),
   });
 
   const handleOnChange = React.useCallback(
@@ -42,6 +43,7 @@ export default function Home() {
       code: "",
       description: "",
       code128: "",
+      id: new Date().getTime(),
     });
 
     handleToast();

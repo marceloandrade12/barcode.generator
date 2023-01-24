@@ -13,6 +13,8 @@ import { Button } from "@/components/button";
 export default function List() {
   const codes = useCodesStore((state) => state.codes);
 
+  const deleteCode = useCodesStore((state) => state.deleteCode);
+
   const body = codes.map((c) => [c.description, c.code, c.code128]);
 
   const handleOnClickExport = React.useCallback((): void => {
@@ -43,6 +45,13 @@ export default function List() {
     doc.save(`barcode-${new Date().toISOString()}.pdf`);
   }, [body]);
 
+  const handleOnDeleteItem = React.useCallback(
+    (index: number): void => {
+      deleteCode(codes[index]);
+    },
+    [codes, deleteCode]
+  );
+
   return (
     <NoSsr>
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg mt-[30px] w-4/5">
@@ -55,11 +64,14 @@ export default function List() {
               <th scope="col" className="px-6 py-3">
                 Código
               </th>
+              <th scope="col" className="px-6 py-3">
+                Ações
+              </th>
             </tr>
           </thead>
           <tbody>
             {codes.map((c, index) => (
-              <tr key={index} className="bg-white border-b ">
+              <tr key={index} className="bg-white border-b hover:bg-sky-700">
                 <th
                   scope="row"
                   className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
@@ -74,16 +86,40 @@ export default function List() {
                     classNameForBar="text-4xl"
                   />
                 </td>
+                <td>
+                  <div
+                    className="flex space-x-2 justify-center"
+                    onClick={() => handleOnDeleteItem(index)}
+                  >
+                    <svg
+                      width="20px"
+                      height="20px"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M6 7V18C6 19.1046 6.89543 20 8 20H16C17.1046 20 18 19.1046 18 18V7M6 7H5M6 7H8M18 7H19M18 7H16M10 11V16M14 11V16M8 7V5C8 3.89543 8.89543 3 10 3H14C15.1046 3 16 3.89543 16 5V7M8 7H16"
+                        stroke="#000000"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <Button
-        text="Exportar"
-        onClick={handleOnClickExport}
-        className="mt-[30px]"
-      />
+      {codes?.length > 0 && (
+        <Button
+          text="Exportar"
+          onClick={handleOnClickExport}
+          className="mt-[30px]"
+        />
+      )}
     </NoSsr>
   );
 }
